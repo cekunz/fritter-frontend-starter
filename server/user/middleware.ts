@@ -38,6 +38,34 @@ const isValidUsername = (req: Request, res: Response, next: NextFunction) => {
 };
 
 /**
+ * Checks if the username exists in the database
+ */
+ const isUsernameCreated = async (req: Request, res: Response, next: NextFunction) => {
+  const username = (req.query.username as string) ?? undefined;
+  const user = await UserCollection.findOneByUsername(username);
+
+  if (user !== undefined && user !== null) {
+    next();
+  } else {
+    res.status(404).json({error: 'Invalid username provided.'});
+  }
+};
+
+/**
+ * Checks if the userID exists in the database
+ */
+ const isUserIDCreated = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = (req.query.userId as string) ?? undefined;
+  const user = await UserCollection.findOneByUserId(userId);
+
+  if (user !== undefined && user !== null) {
+    next();
+  } else {
+    res.status(404).json({error: 'Invalid userId provided.'});
+  }
+};
+
+/**
  * Checks if a password in req.body is valid, that is, at 6-50 characters long without any spaces
  */
 const isValidPassword = (req: Request, res: Response, next: NextFunction) => {
@@ -149,6 +177,8 @@ export {
   isUserLoggedIn,
   isUserLoggedOut,
   isUsernameNotAlreadyInUse,
+  isUsernameCreated,
+  isUserIDCreated,
   isAccountExists,
   isAuthorExists,
   isValidUsername,

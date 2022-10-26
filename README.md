@@ -30,7 +30,7 @@ Make a copy of this repository under your personal GitHub account by clicking th
 ## Setup
 To incorporate the backend you developed in A5 with our starter frontend, please move your files into the `server` folder. For example, note that whereas the `freet` and `user` folders were in the root directory of your backend, they have been now moved to `server/freet` and `server/user`, respectively.
 
-We've made some updated to the A5 server starter code that we hope you can incorporate into your backend as well.
+We've made some updates to the A5 server starter code that we hope you can incorporate into your backend as well.
 
 > **Please reference the [full diff here](https://gist.github.com/dengzac/a9f592950e947b604798443b5ce71be1) for a complete list of changes.**
 
