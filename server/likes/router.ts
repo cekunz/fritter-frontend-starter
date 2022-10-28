@@ -36,6 +36,32 @@ router.get(
 });
 
 /**
+ * Get all likes by a given user
+ *
+ * @name GET api/likes/username
+ *
+ * @return {String[]} - A list of all the freets liked by userId
+ * @throws {403} - If the user is not logged in
+ * @throws {404} - If the freet ID is invalid
+ */
+ router.get(
+  '/:username?',
+  [
+    userValidator.isUserLoggedIn,
+  ],
+  async (req: Request, res: Response) => {
+    const username = (req.params.username as string) ?? undefined;
+    if (username !== undefined) {
+        const likes = await LikeCollection.findLikesByUser(username);
+        res.status(200).json({
+            message: 'The likes were found successfully.',
+            likes: likes});
+    } else {
+        res.status(404)
+    } 
+});
+
+/**
  * Send a like to a freet
  *
  * @name POST /api/likes?freetId=id

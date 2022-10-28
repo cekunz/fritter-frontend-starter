@@ -9,12 +9,12 @@
       <h3 class="author">
         @{{ freet.author }}
       </h3>
-      <div 
+      <!-- <div 
         v-if="$store.state.username !== null">
         <FollowButton 
         :username="freet.author"
         />
-      </div>
+      </div> -->
       
       <div
         v-if="$store.state.username === freet.author"
@@ -64,7 +64,7 @@
     v-if="$store.state.username !== null">
     <LikeButton
       v-if="!editing"
-      :freetId=freet._id
+      :freet="freet"
     />
     </div>
 
@@ -82,10 +82,10 @@
 
 <script>
 import LikeButton from '../Likes/LikeButton.vue';
-import FollowButton from '../Follow/FollowButton.vue'
+// import FollowButton from '../Follow/FollowButton.vue'
 
 export default {
-  components: { LikeButton, FollowButton },
+  components: { LikeButton,  },// FollowButton
   name: 'FreetComponent',
   props: {
     // Data from the stored freet
@@ -98,7 +98,7 @@ export default {
     return {
       editing: false, // Whether or not this freet is in edit mode
       draft: this.freet.content, // Potentially-new content for this freet
-      alerts: {} // Displays success/error messages encountered during freet modification
+      alerts: {}, // Displays success/error messages encountered during freet modification
     };
   },
   methods: {

@@ -13,7 +13,6 @@ import FocusModel from './model';
 
     const focus = await FocusModel.find({user: user, name: settingName});
     
-    console.log('here',focus)
     if (focus.length === 0) {
         res.status(405).json({
             error: "This focus setting doesn't exist!"

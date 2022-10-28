@@ -9,7 +9,6 @@ import FollowCollection from './collection';
     const following = req.query.userId;
     const sessionUser = req.session.userId
     if (following === sessionUser) {
-        console.log('self follow')
         res.status(406).json({
             error: "You can't follow yourself!"
             });

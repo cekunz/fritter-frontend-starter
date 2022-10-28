@@ -5,7 +5,7 @@
       v-if="!liked"
       @click="submitLike"  
     >
-      Like ❤️
+      Like ❤️ 
     </button> 
 
     <button
@@ -17,23 +17,39 @@
   </div>
 </template>
 
+ 
 <script>
+// import {mapState} from 'vuex';
+
 export default {
+
   name: 'LikeButton',
   props: {
     // need the id from the current freet being liked
-    freetId: {
-      type: String,
+    freet: {
+      type: Object,
       required: true
     }
   },
   data() {
     return {
-      liked: false, // Whether or not this freet has been liked
+      liked: false,
       alerts: {} // Displays success/error messages encountered during liking a freet
     };
   },
+  mounted() { // can try created() // created runs as page loads
+    this.getLiked();
+  },
+  // computed: {
+  //   ...mapState(['liked'])
+  // },
   methods: {
+  getLiked() {
+    const allLikes = this.$store.state.likes.filter((x) => x.post === this.freet._id)
+    const liked = (allLikes.length === 1)
+    this.liked = liked;
+    return liked
+  },
    submitLike() {
       /**
        * Sends like to a freet
@@ -49,12 +65,9 @@ export default {
         method: 'POST',
         message: 'Successfully liked freet!',
         callback: () => {
-          this.$set(this.alerts, params.message, 'success');
-          setTimeout(() => this.$delete(this.alerts, params.message), 3000);
         }
       };
       this.request(params);
-      this.liked = true;
     },
     removeLike() {
       /**
@@ -71,12 +84,9 @@ export default {
         method: 'DELETE',
         message: 'Successfully removed like from freet!',
         callback: () => {
-          this.$set(this.alerts, params.message, 'success');
-          setTimeout(() => this.$delete(this.alerts, params.message), 3000);
         }
       };
       this.request(params);
-      this.liked = false;
     },
 
     async request(params) {
@@ -90,15 +100,16 @@ export default {
       };
 
       try {
-        const r = await fetch(`/api/likes/${this.freetId}`, options);
+        const r = await fetch(`/api/likes/${this.freet._id}`, options);
         if (!r.ok) {
           const res = await r.json();
           throw new Error(res.error);
         }
       
-        // this.$store.commit('refreshFreets'); // check if this is needed
-
+        this.$store.commit('refreshLikes'); 
+        this.getLiked();
         params.callback();
+
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);

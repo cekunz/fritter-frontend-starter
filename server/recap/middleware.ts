@@ -35,8 +35,6 @@ const formatDate = (date: Date): string => moment(date).format('MM DD YYYY, h:mm
 
      // check that we aren't going into the future 
     const currentDate: string[] = formatDate(new Date()).split(' ');
-    console.log(currentDate)
-    console.log(startDay, startMonth, startYear)
     if (currentDate[2] >= startYear && currentDate[0] >= startMonth && currentDate[1] >= startDay) {
         next();
     } else {

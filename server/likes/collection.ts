@@ -5,6 +5,7 @@ import type {User} from '../user/model';
 import UserCollection from '../user/collection';
 import FreetModel from '../freet/model';
 import { formatDate } from './util'
+import UserModel from '../user/model';
 
 /**
  * This files contains a class that has the functionality to explore likes
@@ -22,6 +23,18 @@ import { formatDate } from './util'
         const likes: Like[] = await LikeModel.find({post: freet});
         const userLikes: User[] = likes.map((x) => x.user);
         return userLikes;
+    }
+
+     /**
+    * Get all the likes sent by a given user
+    *
+    * @param {string} username - The username
+    * @return {Promise<Array<Like>>} - An array of all of the likes sent by the user
+    */
+      static async findLikesByUser(username: string): Promise<Array<Like>> {
+        const user = await UserCollection.findOneByUsername(username);
+        const likes: Like[] = await LikeModel.find({user: user});
+        return likes;
     }
 
     /**

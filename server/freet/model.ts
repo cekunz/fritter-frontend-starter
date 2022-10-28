@@ -1,5 +1,6 @@
 import type {Types} from 'mongoose';
 import {Schema, model} from 'mongoose';
+import { Like } from '../likes/model';
 import type {User} from '../user/model';
 
 /**
@@ -13,6 +14,7 @@ export type Freet = {
   authorId: Types.ObjectId;
   dateCreated: Date;
   content: string;
+  likes: Like[];
   dateModified: Date;
 };
 
@@ -21,6 +23,7 @@ export type PopulatedFreet = {
   authorId: User;
   dateCreated: Date;
   content: string;
+  likes: Like[];
   dateModified: Date;
 };
 
@@ -45,6 +48,11 @@ const FreetSchema = new Schema<Freet>({
     type: String,
     required: true
   },
+  // all the likes on the post
+  likes: {
+    type: Schema.Types.Mixed,  
+    required: true
+},
   // The date the freet was modified
   dateModified: {
     type: Date,
