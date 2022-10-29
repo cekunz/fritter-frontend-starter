@@ -2,14 +2,14 @@
 <template>
   <div>
     <button
-      v-if="!liked"
+      v-if="!(($store.state.likes.filter((x) => x.post === freet._id)).length === 1)"
       @click="submitLike"  
     >
       Like ❤️ 
     </button> 
 
     <button
-      v-if="liked"
+      v-if="(($store.state.likes.filter((x) => x.post === freet._id)).length === 1)"
       @click="removeLike"  
     >
       Freet Liked
@@ -19,10 +19,8 @@
 
  
 <script>
-// import {mapState} from 'vuex';
 
 export default {
-
   name: 'LikeButton',
   props: {
     // need the id from the current freet being liked
@@ -33,28 +31,15 @@ export default {
   },
   data() {
     return {
-      liked: false,
       alerts: {} // Displays success/error messages encountered during liking a freet
     };
   },
-  mounted() { // can try created() // created runs as page loads
-    this.getLiked();
-  },
-  // computed: {
-  //   ...mapState(['liked'])
-  // },
   methods: {
-  getLiked() {
-    const allLikes = this.$store.state.likes.filter((x) => x.post === this.freet._id)
-    const liked = (allLikes.length === 1)
-    this.liked = liked;
-    return liked
-  },
    submitLike() {
       /**
        * Sends like to a freet
        */
-      if (this.liked) {
+      if (((this.$store.state.likes.filter((x) => x.post === this.freet._id)).length === 1)) {
         const error = 'Error: You have already liked this freet.';
         this.$set(this.alerts, error, 'error'); // Set an alert to be the error text, timeout of 3000 ms
         setTimeout(() => this.$delete(this.alerts, error), 3000);
@@ -73,7 +58,7 @@ export default {
       /**
        * Removes like from a freet
        */
-      if (!this.liked) {
+      if (((this.$store.state.likes.filter((x) => x.post === this.freet._id)).length === 0)) {
         const error = 'Error: You have not yet liked this freet.';
         this.$set(this.alerts, error, 'error'); // Set an alert to be the error text, timeout of 3000 ms
         setTimeout(() => this.$delete(this.alerts, error), 3000);
@@ -83,8 +68,7 @@ export default {
       const params = {
         method: 'DELETE',
         message: 'Successfully removed like from freet!',
-        callback: () => {
-        }
+        callback: () => { }
       };
       this.request(params);
     },
@@ -107,7 +91,6 @@ export default {
         }
       
         this.$store.commit('refreshLikes'); 
-        this.getLiked();
         params.callback();
 
       } catch (e) {

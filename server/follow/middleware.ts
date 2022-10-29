@@ -1,4 +1,5 @@
 import type {Request, Response, NextFunction} from 'express';
+import UserCollection from '../user/collection';
 import FollowCollection from './collection';
 
 
@@ -22,11 +23,12 @@ import FollowCollection from './collection';
  * Checks if the follow trying to be made already exists
  */
  const isAlreadyFollowing = async (req: Request, res: Response, next: NextFunction) => {
-    const following = (req.query.userId as string) ?? undefined;
+    const userId = (req.query.userId as string) ?? undefined;
+    const followingUsername = await UserCollection.findOneByUserId(userId)
     const sessionUser = ( req.session.userId as string) ?? undefined;
-  
+   
     const usersFollowed = await FollowCollection.findUsersFollowed(sessionUser);
-    usersFollowed.filter((x) => JSON.stringify(x._id) === following);
+    usersFollowed.filter((x) => JSON.stringify(x) === followingUsername.username);
     if (usersFollowed.length > 0) {
         res.status(407).json({
             error: 'You already follow this user!'
@@ -40,11 +42,12 @@ import FollowCollection from './collection';
  * Checks if the user is trying to unfollow someone they don't follow
  */
  const unfollowWithoutFollow = async (req: Request, res: Response, next: NextFunction) => {
-    const following = (req.query.userId as string) ?? undefined;
+    const userId = (req.query.userId as string) ?? undefined;
+    const followingUsername = await UserCollection.findOneByUserId(userId)
     const sessionUser = ( req.session.userId as string) ?? undefined;
   
     const usersFollowed = await FollowCollection.findUsersFollowed(sessionUser);
-    usersFollowed.filter((x) => JSON.stringify(x._id) === following);
+    usersFollowed.filter((x) => JSON.stringify(x) === followingUsername.username);
     if (usersFollowed.length === 0) {
         res.status(405).json({
             error: 'You do not follow this user!'

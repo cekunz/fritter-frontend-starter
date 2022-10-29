@@ -21,6 +21,7 @@ export default {
       const user = res.user;
       this.$store.commit('setUsername', user ? user.username : null);
       this.$store.commit('refreshLikes');
+      this.$store.commit('refreshFollowing')
     });
 
     // Clear alerts on page refresh

@@ -4,6 +4,7 @@ import FollowModel from './model';
 import type {User} from '../user/model';
 import UserCollection from '../user/collection';
 import { formatDate } from '../likes/util';
+import { json } from 'express';
 
 /**
  * This files contains a class that has the functionality to explore following
@@ -13,15 +14,40 @@ import { formatDate } from '../likes/util';
     /**
     * Get all the users that follow a specific user
     *
-    * @param {string} userId - The id of the given user
+    * @param {string} username - Theusername of the given user
     * @return {Promise<Array<User>>} - An array of all of the users who follow userID
     */
-    static async findFollowingForUser(userId: Types.ObjectId | string): Promise<Array<User>> {
-        const user: User = await UserCollection.findOneByUserId(userId);
+    static async findFollowingForUser(username:string): Promise<Array<User>> {
+        const user: User = await UserCollection.findOneByUsername(username);
         const followerList: Array<Follow> = await FollowModel.find({following: user});
         const followerUsers = followerList.map((x) => x.follower);
         return followerUsers
     }
+
+     /**
+    * Get all the users that a specific user follows
+    *
+    * @param {string} username - The id of the given user
+    * @return {Promise<Array<string>>} - An array of all of the users who the user associated with UserId follows
+    */
+      static async findUsersFollowed(username: string): Promise<Array<string>> {
+        const user: User = await UserCollection.findOneByUsername(username);
+        console.log('find users followed user', user.username )
+        const followingList: Follow[] = await FollowModel.find({follower:user});
+        const test = followingList.map((x) => x._id);
+        // const testarray =[]
+        // for (const id of test) {
+        //     const newUser: User = await UserCollection.findOneByUserId(id);
+        //     testarray.push(newUser);
+        // }
+        // console.log('test', test, testarray)
+        const followingUsers: string[] = followingList.map((x) => JSON.stringify(x.following));
+        console.log('stringified, ', followingUsers)
+        const usernameList: string[] = []
+        
+        return usernameList
+    }
+
 
     /**
     * Get all the users that follow a specific user on a specific day
@@ -61,18 +87,6 @@ import { formatDate } from '../likes/util';
         return dayFollows
     }
 
-    /**
-    * Get all the users that a specific user follows
-    *
-    * @param {string} username - The id of the given user
-    * @return {Promise<Array<User>>} - An array of all of the users who the user associated with UserId follows
-    */
-     static async findUsersFollowed(username: string): Promise<Array<User>> {
-        const user: User = await UserCollection.findOneByUsername(username);
-        const followingList: Array<Follow> = await FollowModel.find({follower: user._id});
-        const followingUsers = followingList.map((x) => x.following);
-        return followingUsers
-    }
 
     /**
      * Follow a user
@@ -84,14 +98,14 @@ import { formatDate } from '../likes/util';
     static async followUser(followerUserId: string, followingUsername: string): Promise<{ following: string; follower: string; date: string; }> {
         const followingUser = await UserCollection.findOneByUserId(followerUserId);
         const followedUser = await UserCollection.findOneByUsername(followingUsername);
-        const followedUserId = followedUser._id;
-        
         const followTime = formatDate(new Date()); // use one single date for both the following/being followed
 
-        const newFollow = new FollowModel({following:followedUserId, follower: followingUser, date:followTime});
+        const newFollow = new FollowModel({following:followedUser, follower: followingUser, date:followTime});
+        
         await newFollow.save();  // save to DB
 
         const followReturnObj = {"following": followedUser.username, "follower": followingUser.username, "date": followTime}
+        console.log('new follow', newFollow)
         return followReturnObj;
     }
 

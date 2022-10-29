@@ -82,10 +82,10 @@
 
 <script>
 import LikeButton from '../Likes/LikeButton.vue';
-// import FollowButton from '../Follow/FollowButton.vue'
+import FollowButton from '../Follow/FollowButton.vue'
 
 export default {
-  components: { LikeButton,  },// FollowButton
+  components: { LikeButton,  FollowButton },
   name: 'FreetComponent',
   props: {
     // Data from the stored freet
