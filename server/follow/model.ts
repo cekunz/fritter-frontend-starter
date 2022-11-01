@@ -9,6 +9,13 @@ import type { User } from '../user/model';
 // Type definition for Follow on the backend
 export type Follow =  {
     _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
+    following: Types.ObjectId;
+    follower: Types.ObjectId;
+    date: string;
+};
+
+export type PopulatedFollow =  {
+    _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
     following: User;
     follower: User;
     date: string;

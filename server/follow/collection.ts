@@ -4,7 +4,7 @@ import FollowModel from './model';
 import type {User} from '../user/model';
 import UserCollection from '../user/collection';
 import { formatDate } from '../likes/util';
-import { json } from 'express';
+import { constructFollowResponse, FollowUsernames } from './util';
 
 /**
  * This files contains a class that has the functionality to explore following
@@ -15,37 +15,29 @@ import { json } from 'express';
     * Get all the users that follow a specific user
     *
     * @param {string} username - Theusername of the given user
-    * @return {Promise<Array<User>>} - An array of all of the users who follow userID
+    * @return {Promise<Array<String>>} - An array of all of the users who follow userID
     */
-    static async findFollowingForUser(username:string): Promise<Array<User>> {
-        const user: User = await UserCollection.findOneByUsername(username);
-        const followerList: Array<Follow> = await FollowModel.find({following: user});
-        const followerUsers = followerList.map((x) => x.follower);
-        return followerUsers
+    static async findFollowingForUser(username:string): Promise<Array<String>> {
+        const user = await UserCollection.findOneByUsername(username);
+        const followerList = await FollowModel.find({following: user});
+        const followerUsers = followerList.map(constructFollowResponse);
+
+        return followerUsers.map((follow) => follow.follower)
     }
 
      /**
     * Get all the users that a specific user follows
     *
     * @param {string} username - The id of the given user
-    * @return {Promise<Array<string>>} - An array of all of the users who the user associated with UserId follows
+    * @return {Promise<Array<String>>} - An array of all of the users who the user associated with UserId follows
     */
-      static async findUsersFollowed(username: string): Promise<Array<string>> {
-        const user: User = await UserCollection.findOneByUsername(username);
-        console.log('find users followed user', user.username )
-        const followingList: Follow[] = await FollowModel.find({follower:user});
-        const test = followingList.map((x) => x._id);
-        // const testarray =[]
-        // for (const id of test) {
-        //     const newUser: User = await UserCollection.findOneByUserId(id);
-        //     testarray.push(newUser);
-        // }
-        // console.log('test', test, testarray)
-        const followingUsers: string[] = followingList.map((x) => JSON.stringify(x.following));
-        console.log('stringified, ', followingUsers)
-        const usernameList: string[] = []
-        
-        return usernameList
+      static async findUsersFollowed(username: string): Promise<Array<String>> {
+        const user = await UserCollection.findOneByUsername(username);
+        const followingList = await FollowModel.find({follower:user});
+        console.log('in collection', followingList)
+        const followingUsers = followingList.map(constructFollowResponse);
+        console.log('after util', followingUsers)
+        return followingUsers.map((follow) => follow.following)
     }
 
 
@@ -95,7 +87,7 @@ import { json } from 'express';
      * @param {string} followingUsername - the Id of the user to follow
      * @return {Promise<{ following: string; follower: string; date: Date; }>} - The new follow information
      */
-    static async followUser(followerUserId: string, followingUsername: string): Promise<{ following: string; follower: string; date: string; }> {
+    static async followUser(followerUserId: string, followingUsername: string): Promise<FollowUsernames> {
         const followingUser = await UserCollection.findOneByUserId(followerUserId);
         const followedUser = await UserCollection.findOneByUsername(followingUsername);
         const followTime = formatDate(new Date()); // use one single date for both the following/being followed
@@ -104,8 +96,8 @@ import { json } from 'express';
         
         await newFollow.save();  // save to DB
 
-        const followReturnObj = {"following": followedUser.username, "follower": followingUser.username, "date": followTime}
-        console.log('new follow', newFollow)
+
+        const followReturnObj = constructFollowResponse(newFollow);
         return followReturnObj;
     }
 
@@ -120,7 +112,6 @@ import { json } from 'express';
         const followingUser = await UserCollection.findOneByUserId(followerUserId);
         const followedUser = await UserCollection.findOneByUsername(followingUsername);
         const followedUserId = followedUser._id;
-        // const followedUser = await UserCollection.findOneByUserId(followingUserId);
 
         const follow = await FollowModel.deleteMany({following:followedUserId, follower: followingUser})
         return follow !== null;

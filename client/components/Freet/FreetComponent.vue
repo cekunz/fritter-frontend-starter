@@ -9,12 +9,12 @@
       <h3 class="author">
         @{{ freet.author }}
       </h3>
-      <!-- <div 
+      <div 
         v-if="$store.state.username !== null">
         <FollowButton 
         :username="freet.author"
         />
-      </div> -->
+      </div>
       
       <div
         v-if="$store.state.username === freet.author"

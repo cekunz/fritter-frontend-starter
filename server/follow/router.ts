@@ -4,6 +4,8 @@ import * as userValidator from '../user/middleware';
 import * as followValidator from '../follow/middleware';
 import type {User} from '../user/model'
 import FollowCollection from './collection';
+import { FollowUsernames } from './util';
+
 
 const router = express.Router();
 
@@ -24,7 +26,7 @@ router.get(
   ],
   async (req: Request, res: Response) => {
     const username = (req.query.username as string) ?? undefined;
-    const followerList: User[] = await FollowCollection.findFollowingForUser(username);
+    const followerList: String[] = await FollowCollection.findFollowingForUser(username);
     res.status(200).json({
     message: 'The followers list was found successfully.',
     followers: followerList}); 
@@ -48,7 +50,7 @@ router.get(
     async (req: Request, res: Response) => {
       const username = (req.query.username as string) ?? undefined;
       console.log('username', username)
-      const followingList: string[] = await FollowCollection.findUsersFollowed(username);
+      const followingList: String[] = await FollowCollection.findUsersFollowed(username);
       res.status(200).json({
       message: 'The following list was found successfully.',
       following: followingList}); 
