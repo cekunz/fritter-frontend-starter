@@ -1,33 +1,31 @@
 
 <template>
-  <div
-    v-if="$store.state.username !== username"
-    >
+  <div>
     <button
-      v-if="(($store.state.following.filter((x) => x === username)).length === 0)" 
-      @click="followUser"  
+      @click="flagFreet"  
     >
-     Follow
+      Like ❤️ 
     </button> 
 
     <button
-       v-if="(($store.state.following.filter((x) => x === username)).length === 1)" 
-      @click="unfollowUser"  
+     
+      @click="removeFlag"  
     >
-      Unfollow
+      Freet Liked
     </button> 
   </div>
 </template>
 
-
+ 
 <script>
-
+//   <!-- v-if="!(($store.state.likes.filter((x) => x.post === freet._id)).length === 1)" -->
+//  v-if="(($store.state.likes.filter((x) => x.post === freet._id)).length === 1)"
 export default {
-  name: 'FollowButton',
+  name: 'LikeButton',
   props: {
-    // the user to follow
-    username: {
-      type: String,
+    // need the id from the current freet being liked
+    freet: {
+      type: Object,
       required: true
     }
   },
@@ -37,51 +35,44 @@ export default {
     };
   },
   methods: {
-   followUser() {
+   submitLike() {
       /**
-       * Follow a user
+       * Sends like to a freet
        */
-      if (((this.$store.state.following.filter((x) => x === this.username)).length === 1)) {
-        const error = 'Error: You have already followed this user.';
+      if (((this.$store.state.likes.filter((x) => x.post === this.freet._id)).length === 1)) {
+        const error = 'Error: You have already liked this freet.';
         this.$set(this.alerts, error, 'error'); // Set an alert to be the error text, timeout of 3000 ms
         setTimeout(() => this.$delete(this.alerts, error), 3000);
         return;
       }
 
       const params = {
-        route: `/api/follow?username=${this.username}`,
         method: 'POST',
-        message: 'Successfully followed user!',
+        message: 'Successfully liked freet!',
         callback: () => {
-          this.$set(this.alerts, params.message, 'success');
-          setTimeout(() => this.$delete(this.alerts, params.message), 3000);
         }
       };
-    
       this.request(params);
     },
-    unfollowUser() {
+    removeLike() {
       /**
-       * Unfollow a user
+       * Removes like from a freet
        */
-      if (((this.$store.state.following.filter((x) => x === this.username)).length === 0)) {
-        const error = 'Error: You have not yet followed this user.';
+      if (((this.$store.state.likes.filter((x) => x.post === this.freet._id)).length === 0)) {
+        const error = 'Error: You have not yet liked this freet.';
         this.$set(this.alerts, error, 'error'); // Set an alert to be the error text, timeout of 3000 ms
         setTimeout(() => this.$delete(this.alerts, error), 3000);
         return;
       }
 
       const params = {
-        route: `/api/follow?username=${this.username}`,
         method: 'DELETE',
-        message: 'Successfully unfollowed user.',
-        callback: () => {
-          this.$set(this.alerts, params.message, 'success');
-          setTimeout(() => this.$delete(this.alerts, params.message), 3000);
-        }
+        message: 'Successfully removed like from freet!',
+        callback: () => { }
       };
       this.request(params);
     },
+
     async request(params) {
       /**
        * Submits a request to the like endpoint
@@ -93,15 +84,15 @@ export default {
       };
 
       try {
-        const r = await fetch(params.route, options);
+        const r = await fetch(`/api/likes/${this.freet._id}`, options);
         if (!r.ok) {
           const res = await r.json();
           throw new Error(res.error);
         }
       
-        this.$store.commit('refreshFollowing'); 
-
+        this.$store.commit('refreshLikes'); 
         params.callback();
+
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);

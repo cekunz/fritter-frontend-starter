@@ -40,13 +40,13 @@ import UserModel from '../user/model';
     /**
     * Get all the likes by a user for a given day
     *
-    * @param {string} likerId - The id of the user liking the freet
+    * @param {string} username - The id of the user liking the freet
     * @param {Date} date - The day the likes were sent
     * @return {Promise<Array<Like>>} - An array of all of likes from thay day
     */
-     static async findLikesByDay(likerId: Types.ObjectId | string, date: string ): Promise<Array<Like>> {
-        const liker: User = await UserCollection.findOneByUserId(likerId);
-        const likes: Like[] = await LikeModel.find({user: liker});
+     static async findLikesByDay(username: string, date: string ): Promise<Array<Like>> {
+        const liker: User = await UserCollection.findOneByUserId(username);
+        const likes: Like[] = await LikeModel.find({user: liker._id});
         const dayLikes: Like[] = likes.filter((x) => {
                         const substrings = x.likeDate.split(',');
                         return (substrings[0] === date);

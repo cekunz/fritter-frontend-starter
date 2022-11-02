@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
+import moment from 'moment';
+import { Like } from 'server/likes/model';
 
 Vue.use(Vuex);
 
@@ -13,7 +15,13 @@ const store = new Vuex.Store({
     freets: [], // All freets created in the app
     username: null, // Username of the logged in user
     likes: [], // all likes by user currently logged in
+    flags: [],
     following: [],
+    recap: {
+      likes: [],
+      following: [],
+      followers: [],
+    },
     alerts: {} // global success/error messages encountered during submissions to non-visible forms
   },
   mutations: {
@@ -65,10 +73,58 @@ const store = new Vuex.Store({
         const url = `/api/follow/following?username=${state.username}`;
         const res = await fetch(url).then(async r => r.json());
         state.following = res.following; 
-        console.log('following!', state.following)
 
       } else state.following = [];
     },
+    async refreshRecap(state) {
+      const startDate = new Date();
+      for (let i=0; i<7; i++) {
+        const currDate = moment(startDate).subtract(i, "days").format('MMMM Do YYYY');
+
+      const options = {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: this.username, date: currDate})
+      };
+
+      try {
+        const r = await fetch(`/api/recap`, options);
+        const res = await r.json();
+        if (!r.ok) {
+          throw new Error(res.error);
+        }
+
+        const dayRecap = res.recap; 
+        if (dayRecap.likes.length) {
+            const mapped = dayRecap.likes.map((like: Like) => like.post); // string for the post ID
+            state.recap.likes.push(mapped);
+        }
+        if (dayRecap.followings.length) {
+            state.recap.following.push(dayRecap.followings);
+        }
+        if (dayRecap.followers.length) {
+            state.recap.followers.push(dayRecap.followers);
+        }
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+
+    }
+
+    },
+    // async refreshFlags(state) {
+    //   /**
+    //    * Update the list of people followed by the user logged in
+    //    */
+     
+    //   if (state.username !== null) {
+    //     const url = `/api/flag?freetId=${state.username}`;
+    //     const res = await fetch(url).then(async r => r.json());
+    //     state.following = res.following; 
+
+    //   } else state.following = [];
+    // },
     async refreshFreets(state) {
       /**
        * Request the server for the currently available freets.

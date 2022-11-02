@@ -9,17 +9,17 @@ class RecapCollection {
   /**
    * Create a recap
    *
-   * @param {string} userId - The user the recap is built for
+   * @param {string} username - The user the recap is built for
    * @param {string} date - The day the recap is built for
    * @return {Promise<HydratedDocument<User>>} - The newly created recap
    */
-  static async createRecap(userId: string, date: string): Promise<HydratedDocument<Recap>> {
-    const likesByDate = await LikeCollection.findLikesByDay(userId,  date);
-    const followingsByDate = await FollowCollection.findFollowingForUserbyDate(userId, date);
-    const followersByDate = await FollowCollection.findFollowersForUserbyDate(userId, date);
-    const user = await UserCollection.findOneByUserId(userId);
+  static async createRecap(username: string, date: string): Promise<HydratedDocument<Recap>> {
+    const likesByDate = await LikeCollection.findLikesByDay(username,  date);
+    const followingsByDate = await FollowCollection.findFollowingForUserbyDate(username, date);
+    const followersByDate = await FollowCollection.findFollowersForUserbyDate(username, date);
+    const user = await UserCollection.findOneByUsername(username);
 
-    const recap = new RecapModel({user: user, 
+    const recap = new RecapModel({user: username, 
                                   date: date, 
                                   likes: likesByDate, 
                                   followings: followingsByDate, 
