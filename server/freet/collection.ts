@@ -1,4 +1,5 @@
 import type {HydratedDocument, Types} from 'mongoose';
+import moment from 'moment';
 import type {Freet} from './model';
 import FreetModel from './model';
 import UserCollection from '../user/collection';
@@ -20,7 +21,7 @@ class FreetCollection {
    * @return {Promise<HydratedDocument<Freet>>} - The newly created freet
    */
   static async addOne(authorId: Types.ObjectId | string, content: string): Promise<HydratedDocument<Freet>> {
-    const date = new Date();
+    const date = moment(new Date()).format('MMMM Do YYYY');
     const freet = new FreetModel({
       authorId,
       dateCreated: date,
@@ -73,7 +74,7 @@ class FreetCollection {
   static async updateOne(freetId: Types.ObjectId | string, content: string): Promise<HydratedDocument<Freet>> {
     const freet = await FreetModel.findOne({_id: freetId});
     freet.content = content;
-    freet.dateModified = new Date();
+    freet.dateModified = moment(new Date()).format('MMMM Do YYYY');
     await freet.save();
     return freet.populate('authorId');
   }

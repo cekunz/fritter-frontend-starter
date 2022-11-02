@@ -1,6 +1,7 @@
 import type {HydratedDocument} from 'mongoose';
 import moment from 'moment';
 import type {Freet, PopulatedFreet} from '../freet/model';
+import UserCollection from '../user/collection';
 
 // Update this if you add a property to the Freet type!
 type FreetResponse = {
@@ -32,17 +33,46 @@ const constructFreetResponse = (freet: HydratedDocument<Freet>): FreetResponse =
       versionKey: false // Cosmetics; prevents returning of __v property
     })
   };
+
   const {username} = freetCopy.authorId;
   delete freetCopy.authorId;
   return {
     ...freetCopy,
     _id: freetCopy._id.toString(),
     author: username,
-    dateCreated: formatDate(freet.dateCreated),
-    dateModified: formatDate(freet.dateModified)
+    dateCreated: freet.dateCreated,
+    dateModified: freet.dateModified
+  };
+};
+
+/**
+ * Transform a raw Freet object from the database into an object
+ * with all the information needed by the frontend
+ *
+ * @param {HydratedDocument<Freet>} freet - A freet
+ * @returns {FreetResponse} - The freet object formatted for the frontend
+ */
+ const constructFreetResponseUsername = async (freet: HydratedDocument<Freet>): Promise<FreetResponse> => {
+  const freetCopy: PopulatedFreet = {
+    ...freet.toObject({
+      versionKey: false // Cosmetics; prevents returning of __v property
+    })
+  }
+ 
+  const userId = freet.authorId;
+  const user = await UserCollection.findOneByUserId(userId);
+  const {username} = user;
+  delete freet.authorId;
+
+  return {
+    ...freetCopy,
+    _id: freet._id.toString(),
+    author: username,
+    dateCreated: freet.dateCreated,
+    dateModified: freet.dateModified
   };
 };
 
 export {
-  constructFreetResponse
+  constructFreetResponse, constructFreetResponseUsername
 };

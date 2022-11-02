@@ -4,14 +4,14 @@
     <button
       @click="flagFreet"  
     >
-      Like ❤️ 
+      Flag Freet 
     </button> 
 
     <button
      
       @click="removeFlag"  
     >
-      Freet Liked
+      Remove Flag
     </button> 
   </div>
 </template>
@@ -21,7 +21,7 @@
 //   <!-- v-if="!(($store.state.likes.filter((x) => x.post === freet._id)).length === 1)" -->
 //  v-if="(($store.state.likes.filter((x) => x.post === freet._id)).length === 1)"
 export default {
-  name: 'LikeButton',
+  name: 'FlagButton',
   props: {
     // need the id from the current freet being liked
     freet: {

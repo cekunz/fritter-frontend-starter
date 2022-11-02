@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 import moment from 'moment';
-import { Like } from 'server/likes/model';
+// import { Like } from 'server/likes/model';
 
 Vue.use(Vuex);
 
@@ -17,11 +17,7 @@ const store = new Vuex.Store({
     likes: [], // all likes by user currently logged in
     flags: [],
     following: [],
-    recap: {
-      likes: [],
-      following: [],
-      followers: [],
-    },
+    recap: null, 
     alerts: {} // global success/error messages encountered during submissions to non-visible forms
   },
   mutations: {
@@ -77,41 +73,18 @@ const store = new Vuex.Store({
       } else state.following = [];
     },
     async refreshRecap(state) {
-      const startDate = new Date();
-      for (let i=0; i<7; i++) {
-        const currDate = moment(startDate).subtract(i, "days").format('MMMM Do YYYY');
-
+      const currDate = moment(new Date()).format('MMMM Do YYYY');
       const options = {
         method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username: this.username, date: currDate})
+        body: JSON.stringify({date: currDate})
       };
-
-      try {
-        const r = await fetch(`/api/recap`, options);
-        const res = await r.json();
-        if (!r.ok) {
-          throw new Error(res.error);
-        }
-
-        const dayRecap = res.recap; 
-        if (dayRecap.likes.length) {
-            const mapped = dayRecap.likes.map((like: Like) => like.post); // string for the post ID
-            state.recap.likes.push(mapped);
-        }
-        if (dayRecap.followings.length) {
-            state.recap.following.push(dayRecap.followings);
-        }
-        if (dayRecap.followers.length) {
-            state.recap.followers.push(dayRecap.followers);
-        }
-
-      } catch (e) {
-        this.$set(this.alerts, e, 'error');
-        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      
+      const r = await fetch(`/api/recap/${state.username}`, options);
+      if (!r.ok) {
+        console.log('error!')
       }
-
-    }
-
+      const res = await r.json();
+      state.recap = res.recap;
     },
     // async refreshFlags(state) {
     //   /**

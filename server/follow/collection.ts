@@ -4,6 +4,7 @@ import FollowModel from './model';
 import type {User} from '../user/model';
 import UserCollection from '../user/collection';
 import { formatDate } from '../likes/util';
+import moment from 'moment';
 
 type followRep = {following: string, follower: string, date: string};
 
@@ -47,12 +48,8 @@ type followRep = {following: string, follower: string, date: string};
      static async findFollowersForUserbyDate(username: string, date:string): Promise<Array<Follow>> {
         const followingList: Follow[] = await FollowModel.find({following: username});
         if (followingList.length === 0) return [];
-
-        const dayFollows: Follow[] = followingList.filter((x) => {
-                const substrings = x.date.split(',');
-                return (substrings[0] === date);
-        });
-
+        const dayFollows: Follow[] = followingList.filter((x) => x.date === date);
+        
         return dayFollows
     }
 
@@ -65,11 +62,7 @@ type followRep = {following: string, follower: string, date: string};
      static async findFollowingForUserbyDate(username: string, date:string): Promise<Array<Follow>> {
         const followerList: Follow[] = await FollowModel.find({follower: username});
         if (followerList.length === 0) return [];
-
-        const dayFollows: Follow[] = followerList.filter((x) => {
-                const substrings = x.date.split(',');
-                return (substrings[0] === date);
-        });
+        const dayFollows: Follow[] = followerList.filter((x) => x.date === date);
 
         return dayFollows
     }
@@ -85,7 +78,7 @@ type followRep = {following: string, follower: string, date: string};
     static async followUser(followerUserId: string, followingUsername: string): Promise<followRep> {
         const followingUser = await UserCollection.findOneByUserId(followerUserId);
         const followedUser = await UserCollection.findOneByUsername(followingUsername);
-        const followTime = formatDate(new Date()); // use one single date for both the following/being followed
+        const followTime = moment(new Date()).format('MMMM Do YYYY');; // use one single date for both the following/being followed
         const newFollow = new FollowModel({following:followedUser.username, follower: followingUser.username, date:followTime});
         
         await newFollow.save();  // save to DB

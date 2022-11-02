@@ -13,12 +13,49 @@
            <div
                 v-if="likedFreets.length"
             >
-                <FreetComponent
-                v-for="freet in $store.state.freets.filter((freet) => likedFreets.includes(freet.id))"
+                <BareFreetComponent
+                v-for="freet in likedFreets"
                 :key="freet.id"
                 :freet="freet"
                 />
+       </div>
+       <div
+             v-if="!likedFreets.length"
+            >
+            <p> You have not liked any Freets this week. </p>    
+       </div>
+       <h4>New Followers</h4>
+       <div
+             v-if="followings.length"
+            >
+            <RecapUserComponent
+                v-for="follow in followings"
+                :key="follow.id"
+                :followedUser="follow.following"
+                :dateFollowed="follow.date"
+            />
+       </div>
+       <div
+             v-if="!followings.length"
+            >
+            <p> You have not followed anyone new this week. </p>    
+       </div>
+       <h4>User's Followed</h4>
+       <div
+             v-if="usersFollowed.length"
+            >
+            <RecapUserComponent
+                v-for="follow in usersFollowed"
+                :key="follow.id"
+                :followedUser="follow.following"
+                :dateFollowed="follow.date"
+            />
       </div>
+      <div
+             v-if="!usersFollowed.length"
+            >
+            <p> You have no new followers this week. </p>    
+       </div>
       </body>
       
     <!-- </section> -->
@@ -34,20 +71,16 @@
 
 <script>
 import moment from 'moment';
-import FreetComponent from '@/components/Freet/FreetComponent.vue';
+import BareFreetComponent from '@/components/Freet/BareFreetComponent.vue';
+import RecapUserComponent from './RecapUserComponent.vue'
 
-// $store.state.freets.filter((freet) => likedFreets.includes(freet.id)).length
 export default {
   name: 'RecapPage',
-  components: {FreetComponent,},
+  components: {BareFreetComponent, RecapUserComponent},
   data() {
     return {
       startDate: new Date(),
       endDate: new Date(),
-      likedFreets: [],
-    //   freetsPosted: [],
-      usersFollowed: [],
-      followings: [],
       alerts: {}, // Displays success/error messages encountered during liking a freet
     };
   },
@@ -55,31 +88,26 @@ export default {
     this.getRecap();
     this.formatDate();
   },
+  computed: {
+    likedFreets() {
+        console.log(this.$store.state.recap.likes)
+        return this.$store.state.recap.likes;
+    },
+    usersFollowed() {
+        console.log(this.$store.state.recap.followings)
+        return this.$store.state.recap.followings;
+    },
+    followings() {
+        return this.$store.state.recap.followers;
+    }
+  },
   methods: {
       getRecap() {
        /**
-       * Gets all recaps for the days in the date range
+       * Gets the most up to date recap
        */
-      for (let i=0; i<7; i++) {
-          const currDate = moment(this.startDate).subtract(i, "days").format('MMMM Do YYYY');
-          const params = {
-            method: 'POST',
-            message: 'Succesfully generated recap!',
-            body: JSON.stringify({username: this.username, date: currDate}),
-            callback: () => {
-            this.$set(this.alerts, params.message, 'success');
-            setTimeout(() => this.$delete(this.alerts, params.message), 3000);
-            }
-        };
-        this.request(params);
-      }
-
-       console.log('FREETS', this.$store.state.freets);
-       console.log('liked freets', this.likedFreets);
-       for (const id of this.likedFreets) {
-        console.log('id', id)
-        console.log(this.$store.state.freets.filter((freet) => likedFreets.includes(freet.id)))
-       }
+       this.$store.commit('refreshRecap'); 
+       console.log('RECAP AFRTER REFRESH', this.$store.state.recap)
     },
     formatDate() {
         const startDate = moment(this.startDate).format('MMMM Do YYYY');
@@ -87,45 +115,33 @@ export default {
         this.startDate = startDate;
         this.endDate = endDate;
     },
-    async request(params) {
-      /**
-       * Submits a request to the recap's endpoint
-       * @param params - Options for the request
-       * @param params.body - Body for the request, if it exists
-       * @param params.callback - Function to run if the the request succeeds
-       */
-      const options = {
-        method: params.method, headers: {'Content-Type': 'application/json'}
-      };
-      if (params.body) {
-        options.body = params.body;
-      }
+//     async request(params) {
+//       /**
+//        * Submits a request to the recap's endpoint
+//        * @param params - Options for the request
+//        * @param params.body - Body for the request, if it exists
+//        * @param params.callback - Function to run if the the request succeeds
+//        */
+//       const options = {
+//         method: params.method, headers: {'Content-Type': 'application/json'}
+//       };
+//       if (params.body) {
+//         options.body = params.body;
+//       }
 
-      try {
-        const r = await fetch(`/api/recap`, options);
-        const res = await r.json();
-        if (!r.ok) {
-          throw new Error(res.error);
-        }
+//       try {
+//         const r = await fetch(`/api/recap`, options);
+//         const res = await r.json();
+//         if (!r.ok) {
+//           throw new Error(res.error);
+//         }
 
-        const dayRecap = res.recap; 
-        if (dayRecap.likes.length) {
-            const mapped = dayRecap.likes.map((like) => like.post);
-            this.likedFreets.push(mapped);
-        }
-        if (dayRecap.followings.length) {
-            this.usersFollowed.push(dayRecap.followings);
-        }
-        if (dayRecap.followers.length) {
-            this.followings.push(dayRecap.followers);
-        }
-
-        params.callback();
-      } catch (e) {
-        this.$set(this.alerts, e, 'error');
-        setTimeout(() => this.$delete(this.alerts, e), 3000);
-      }
-    }
+//         params.callback();
+//       } catch (e) {
+//         this.$set(this.alerts, e, 'error');
+//         setTimeout(() => this.$delete(this.alerts, e), 3000);
+//       }
+//     }
   }
 }
 

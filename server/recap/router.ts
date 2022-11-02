@@ -36,15 +36,14 @@ const router = express.Router();
  * @throws {406} - if the date is formatted incorrectly
  */
 router.post(
-  '/', 
+  '/:username?', 
   [
     userValidator.isUserLoggedIn,
   ],
   async (req: Request, res: Response) => {
     const date: string = req.body.date;
-    const userId = req.session.userId;
-
-    const recap: Recap = await RecapCollection.getRecap(userId, date)
+    const username = (req.params.username as string) ?? undefined;
+    const recap: Recap = await RecapCollection.getRecap(username, date)
     
     res.status(200).json({
         message: 'The recap was connected successfully.',

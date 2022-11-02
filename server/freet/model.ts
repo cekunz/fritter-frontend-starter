@@ -12,19 +12,19 @@ import type {User} from '../user/model';
 export type Freet = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
   authorId: Types.ObjectId;
-  dateCreated: Date;
+  dateCreated: string;
   content: string;
   likes: Like[];
-  dateModified: Date;
+  dateModified: string;
 };
 
 export type PopulatedFreet = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
   authorId: User;
-  dateCreated: Date;
+  dateCreated: string;
   content: string;
   likes: Like[];
-  dateModified: Date;
+  dateModified: string;
 };
 
 // Mongoose schema definition for interfacing with a MongoDB table
@@ -40,7 +40,7 @@ const FreetSchema = new Schema<Freet>({
   },
   // The date the freet was created
   dateCreated: {
-    type: Date,
+    type: String,
     required: true
   },
   // The content of the freet
@@ -55,7 +55,7 @@ const FreetSchema = new Schema<Freet>({
 },
   // The date the freet was modified
   dateModified: {
-    type: Date,
+    type: String,
     required: true
   }
 });

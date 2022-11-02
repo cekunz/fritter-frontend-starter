@@ -6,6 +6,7 @@ import UserCollection from '../user/collection';
 import FreetModel from '../freet/model';
 import { formatDate } from './util'
 import UserModel from '../user/model';
+import moment from 'moment';
 
 /**
  * This files contains a class that has the functionality to explore likes
@@ -45,12 +46,10 @@ import UserModel from '../user/model';
     * @return {Promise<Array<Like>>} - An array of all of likes from thay day
     */
      static async findLikesByDay(username: string, date: string ): Promise<Array<Like>> {
-        const liker: User = await UserCollection.findOneByUserId(username);
+        const liker: User = await UserCollection.findOneByUsername(username);
         const likes: Like[] = await LikeModel.find({user: liker._id});
-        const dayLikes: Like[] = likes.filter((x) => {
-                        const substrings = x.likeDate.split(',');
-                        return (substrings[0] === date);
-                    });
+        const dayLikes: Like[] = likes.filter((x) => x.likeDate === date);
+                       
         return dayLikes; 
     }
 
@@ -65,7 +64,7 @@ import UserModel from '../user/model';
     static async addLike(freetId: string, likerId: string): Promise<HydratedDocument<Like>> {
         const freet = await FreetModel.findOne({_id: freetId});
         const liker: User = await UserCollection.findOneByUserId(likerId);
-        const date = formatDate(new Date());
+        const date = moment(new Date()).format('MMMM Do YYYY');
 
         const like = new LikeModel({user: liker, post:freet, likeDate: date});
         await like.save()

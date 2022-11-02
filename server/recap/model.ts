@@ -1,7 +1,6 @@
 import {Types} from 'mongoose';
 import {Schema, model} from 'mongoose';
-import type { User } from '../user/model';
-import type { Like } from '../likes/model';
+import type { Freet } from '../freet/model';
 import { Follow } from '../follow/model';
 
 
@@ -11,18 +10,17 @@ import { Follow } from '../follow/model';
 // Type definition for Recap on the backend
 export type Recap =  {
     _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
-    user: User,
+    username: string,
     date: string;
-    likes: Like[];
+    likes: Freet[];
     followings: Follow[]
     followers: Follow[]
 };
 
 const RecapSchema = new Schema<Recap>({
-    user: {
-        type: Schema.Types.ObjectId,
+    username:  {
+        type: String,
         required: true,
-        ref: 'User'
     },
     date: {
         type: String,
