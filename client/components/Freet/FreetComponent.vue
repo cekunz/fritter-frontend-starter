@@ -5,68 +5,91 @@
   <article
     class="freet"
   >
-    <header>
-      <h3 class="author">
-        @{{ freet.author }}
-      </h3>
-      <div 
-        v-if="$store.state.username !== null">
-        <FollowButton 
-        :username="freet.author"
-        />
-      </div>
-      
-      <div
-        v-if="$store.state.username === freet.author"
-        class="actions"
-      >
-        <button
-          v-if="editing"
-          @click="submitEdit"
-        >
-          ✅ Save changes
-        </button>
-        <button
-          v-if="editing"
-          @click="stopEditing"
-        >
-          🚫 Discard changes
-        </button>
-        <button
-          v-if="!editing"
-          @click="startEditing"
-        >
-          ✏️ Edit
-        </button>
-        <button @click="deleteFreet">
-          🗑️ Delete
-        </button>
-      </div>
-    </header>
-    <textarea
-      v-if="editing"
-      class="content"
-      :value="draft"
-      @input="draft = $event.target.value"
-    />
-    <p
-      v-else
-      class="content"
-    >
-      {{ freet.content }}
-    </p>
-    <p class="info">
-      Posted on {{ freet.dateModified }}
-      <i v-if="freet.edited">(edited)</i>
-    </p>
-
     <div 
-    v-if="$store.state.username !== null">
-    <LikeButton
-      v-if="!editing"
-      :freet="freet"
-    />
+      v-if="isContentBlocked"
+    >
+      <p>
+          This Freet has been flagged for containing sensitive content that some users may find offensive.
+      </p>
+        
+        <button
+            @click="viewFreet"
+        >
+            View Freet
+        </button>
+
     </div>
+    <div
+        v-if="!isContentBlocked"
+    >
+      <header>
+        <h3 class="author">
+          @{{ freet.author }}
+        </h3>
+        <div 
+          v-if="$store.state.username !== null">
+          <FollowButton 
+          :username="freet.author"
+          />
+        </div>
+        
+        <div
+          v-if="$store.state.username === freet.author"
+          class="actions"
+        >
+          <button
+            v-if="editing"
+            @click="submitEdit"
+          >
+            ✅ Save changes
+          </button>
+          <button
+            v-if="editing"
+            @click="stopEditing"
+          >
+            🚫 Discard changes
+          </button>
+          <button
+            v-if="!editing"
+            @click="startEditing"
+          >
+            ✏️ Edit
+          </button>
+          <button @click="deleteFreet">
+            🗑️ Delete
+          </button>
+        </div>
+      </header>
+      <textarea
+        v-if="editing"
+        class="content"
+        :value="draft"
+        @input="draft = $event.target.value"
+      />
+      <p
+        v-else
+        class="content"
+      >
+        {{ freet.content }}
+      </p>
+      <p class="info">
+        Posted on {{ freet.dateModified }}
+        <i v-if="freet.edited">(edited)</i>
+      </p>
+
+      <footer  
+        v-if="$store.state.username !== null" >
+        <LikeButton
+          v-if="!editing"
+          :freet="freet"
+        />
+        <FlagButton
+          v-if="!editing"
+          :username="freet.author"
+          :freet="freet"
+        />
+      </footer>
+     </div>
 
     <section class="alerts">
       <article
@@ -83,9 +106,10 @@
 <script>
 import LikeButton from '../Likes/LikeButton.vue';
 import FollowButton from '../Follow/FollowButton.vue'
+import FlagButton from '../Flag/FlagButton.vue'
 
 export default {
-  components: { LikeButton,  FollowButton },
+  components: { LikeButton,  FollowButton, FlagButton },
   name: 'FreetComponent',
   props: {
     // Data from the stored freet
@@ -96,12 +120,27 @@ export default {
   },
   data() {
     return {
+      contentBlocked: null,
       editing: false, // Whether or not this freet is in edit mode
       draft: this.freet.content, // Potentially-new content for this freet
       alerts: {}, // Displays success/error messages encountered during freet modification
     };
   },
+  computed: {
+     isContentBlocked() {
+      if (this.contentBlocked === false) return false;
+      if (this.$store.state.flags.length > 0) {
+        const allFlagsForFreet = this.$store.state.flags.filter((flag) => flag.freet === this.freet._id);
+        if (allFlagsForFreet.length > 5) return true;
+        else return false;
+      }
+      else return false;
+    }
+  },
   methods: {
+    viewFreet() {
+      this.contentBlocked = false;
+    },
     startEditing() {
       /**
        * Enables edit mode on this freet.

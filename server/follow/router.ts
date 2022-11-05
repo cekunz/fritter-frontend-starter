@@ -87,7 +87,7 @@ router.post(
 /**
  * Unfollow a user
  *
- * @name DELETE /api/follow?userId:
+ * @name DELETE /api/follow/:userId?
  *
  * @return {string} - A success message
  * @throws {403} - If the user is not logged in 

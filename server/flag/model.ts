@@ -11,21 +11,20 @@ import type { Freet } from '../freet/model';
 // Type definition for Flag on the backend
 export type Flag =  {
     _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
-    post: Freet;
-    user: User;
+    freet: Freet;
+    username: string;
     flagType: string;
 };
 
 const FlagSchema = new Schema<Flag>({
-    post: {
+    freet: {
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'Freet'
     },
-    user: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        ref: 'User'
+    username: {
+        type: String,  
+        required: true
     },
     flagType: {
         type: String,  

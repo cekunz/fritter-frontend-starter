@@ -10,9 +10,9 @@ import FlagCollection from './collection';
 const router = express.Router();
 
 /**
- * Get flags for a post
+ * Get flags for a freet, for a specific user if the user is provided
  *
- * @name GET /api/flag?freetId=id
+ * @name GET /api/flag/username?freetId=id
  * 
  * @param {freetId} - the id for the freet being flagged
  * 
@@ -24,55 +24,65 @@ router.get(
     '/',
     [
       userValidator.isUserLoggedIn,
-      freetValidator.isFreetExistsBody,
+      freetValidator.isFreetExistsQuery, // check
     ],
     async (req: Request, res: Response) => {
-        const freetId = (req.body.id as string) ?? undefined;
-        const flags: Flag[] = await FlagCollection.getFreetFlags(freetId);
+      const freetId = (req.query.freetId as string) ?? undefined;
+      const username = (req.query.username as string) ?? undefined;
+      const flags: Flag[] = await FlagCollection.getFreetFlags(freetId);
+      if (username === undefined) {
         res.status(200).json({
           message: 'The flags were successfully found.',
           flags: flags});
-        } 
+      } else {
+        const filteredFlags = flags.filter((x) => x.username === username);
+        res.status(200).json({
+          message: 'The flags were successfully found.',
+          flags: filteredFlags});
+      }
+    }
+     
   
 );
 
 
 /**
- * Add a Flag to a post
+ * Add a Flag to a freet
  *
- * @name POST /api/flag?freetId=id
+ * @name POST /api/flag?freetId=id&username=username
  * 
  * @param {freetId} - the id for the freet being flagged
  * 
  * @return {Flag} - The flag object created
  * @throws {403} - If the user is not logged in
  * @throws {404} - If the freet ID is invalid
- * @throws {405} - If the user has already flagged the post
+ * @throws {405} - If the user has already flagged the freet
  */
  router.post(
     '/',
     [
       userValidator.isUserLoggedIn,
-      freetValidator.isFreetExistsBody,
+      freetValidator.isFreetExistsQuery,
       flagValidator.doubleFlag,
     ],
     async (req: Request, res: Response) => {
-      const freetId = (req.body.id as string) ?? undefined;
-      const flaggerId = req.session.userId;
-      const flagType = req.body.content;
+      const freetId = (req.query.freetId as string) ?? undefined;
+      const username = req.body.username;
+      const flagType = req.body.type;
       
-      const flag: Flag = await FlagCollection.createFlag(flaggerId, freetId, flagType);
+      const flag: Flag = await FlagCollection.createFlag(username, freetId, flagType);
+      console.log('flag in router', flag)
       res.status(200).json({
         message: 'The flag was added successfully.',
-        flag: {post: flag.post._id, postContent: flag.post.content, flagType: flag.flagType, user: flag.user.username}});
-      } 
-    
+        flag: flag
+      })
+    } 
   );
 
   /**
- * Delete a flag from a post
+ * Delete a flag from a post for a user
  *
- * @name DELETE /api/flag?freetId=id
+ * @name DELETE /api/flag?freetId=id&username=username
  *
  * @return {string} - A success message
  * @throws {403} - If the user is not logged in 
@@ -88,23 +98,23 @@ router.delete(
     ],
     async (req: Request, res: Response) => {
       const freetId = (req.query.freetId as string) ?? undefined;
-      const flaggerId = req.session.userId;
-      const removedFlag = await FlagCollection.removeFlag(flaggerId, freetId);
+      const username = (req.query.username as string) ?? undefined;
+      const removedFlag = await FlagCollection.removeFlag(username, freetId);
       if (removedFlag) {
         res.status(200).json({
-            message: 'The post was unflagged successfully.'}); 
+            message: 'The freet was unflagged successfully.'}); 
       } else {
         res.status(404).json({
-            message: 'There was an error in removing the flag from this post.'}); 
+            message: 'There was an error in removing the flag from this freet.'}); 
       }
         
     });
 
 
 /**
- * Modify a flag
+ * Modify a flag from a user
  *
- * @name PUT /api/flag?freetId=id
+ * @name PUT /api/flag?freetId=id&username=username
  *
  * @param {string} content - the new flag type for the freet
  * @return {Flag} - the updated flag
@@ -116,14 +126,17 @@ router.put(
     '/',
     [
       userValidator.isUserLoggedIn,
-      freetValidator.isFreetExistsBody,
+      freetValidator.isFreetExistsQuery,
       flagValidator.unflagWithoutFlagging,
     ],
     async (req: Request, res: Response) => {
-      const flag = await FlagCollection.updateFlagType(req.session.userId, req.body.id, req.body.content);
+      const freetId = (req.query.freetId as string) ?? undefined;
+      const username = (req.query.username as string) ?? undefined;
+      const flagType = req.body.type;
+      const flag = await FlagCollection.updateFlagType(username, freetId, flagType);
       res.status(200).json({
         message: 'Your flag type was updated successfully.',
-        freet: flag
+        flag: flag
       });
     }
   );

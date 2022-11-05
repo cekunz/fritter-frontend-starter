@@ -18,7 +18,7 @@
         v-if="$store.state.username"
         to="/recap"
       >
-        Your Recap
+        Your Weekly Recap
       </router-link>
       <router-link
         v-if="$store.state.username"
@@ -48,7 +48,7 @@
 <style scoped>
 nav {
     padding: 1vw 2vw;
-    background-color: #ccc;
+    background-color: mediumslateblue;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -56,6 +56,7 @@ nav {
 }
 
 .title {
+   font-family: 'Courier New', Courier, monospace;
     font-size: 32px;
     margin: 0 5px;
 }
@@ -70,6 +71,7 @@ img {
 }
 
 .right {
+    font-family: 'Courier New', Courier, monospace;
     font-size: 20px;
     display: grid;
     gap: 16px;

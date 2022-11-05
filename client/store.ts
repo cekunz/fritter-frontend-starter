@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 import moment from 'moment';
-// import { Like } from 'server/likes/model';
 
 Vue.use(Vuex);
 
@@ -86,18 +85,18 @@ const store = new Vuex.Store({
       const res = await r.json();
       state.recap = res.recap;
     },
-    // async refreshFlags(state) {
-    //   /**
-    //    * Update the list of people followed by the user logged in
-    //    */
-     
-    //   if (state.username !== null) {
-    //     const url = `/api/flag?freetId=${state.username}`;
-    //     const res = await fetch(url).then(async r => r.json());
-    //     state.following = res.following; 
+    async refreshFlags(state) {
+      /**
+       * Update list of flags for each freet
+       */
+      const freetIds = state.freets.map((x) => x._id);
+      for (const i of freetIds) {
+        const url = `/api/flag?freetId=${i}`; 
+        const res = await fetch(url).then(async r => r.json());
+        state.flags = res.flags;
+      }
 
-    //   } else state.following = [];
-    // },
+    },
     async refreshFreets(state) {
       /**
        * Request the server for the currently available freets.

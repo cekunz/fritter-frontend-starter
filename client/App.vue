@@ -23,6 +23,7 @@ export default {
       this.$store.commit('refreshLikes');
       this.$store.commit('refreshFollowing');
       this.$store.commit('refreshRecap');
+      this.$store.commit('refreshFlags');
     });
 
     // Clear alerts on page refresh

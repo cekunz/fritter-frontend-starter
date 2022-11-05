@@ -15,11 +15,11 @@ import FlagModel from './model';
     * Find all flags for a freet
     *
     * @param {string} freetId - The id of the given freet
-    * @return {Promise<Flag[]>} - An array of all of the flags associated with the post
+    * @return {Promise<Flag[]>} - An array of all of the flags associated with the freet
     */
      static async getFreetFlags(freetId: Types.ObjectId | string): Promise<Flag[]> {
         const flags: Array<Flag> = await FlagModel.find()
-        flags.filter((x) => x._id === freetId);
+        flags.filter((x) => JSON.stringify(x.freet._id) === freetId);
         return flags;
     }
 
@@ -28,13 +28,12 @@ import FlagModel from './model';
     *
     * @param {string} userId - The id of the given user
     * @param {string} freetId - The id of the given freet
-    * @param {string} flagType - the type of flag associated with the post content
+    * @param {string} flagType - the type of flag associated with the freet content
     * @return {Promise<Flag>} - An array of all of the users who follow userID
     */
-    static async createFlag(userId: Types.ObjectId | string, freetId: Types.ObjectId | string, flagType: string): Promise<HydratedDocument<Flag>> {
-        const user: User = await UserCollection.findOneByUserId(userId);
-        const post: Freet = await FreetCollection.findOne(freetId);
-        const flag = new FlagModel({post: post, user:user, flagType: flagType})
+     static async createFlag(username: string, freetId: Types.ObjectId | string, flagType: string): Promise<HydratedDocument<Flag>> {
+        const freet: Freet = await FreetCollection.findOne(freetId);
+        const flag = new FlagModel({freet: freet, username:username, flagType: flagType})
         await flag.save();
         
         return flag;
@@ -47,10 +46,9 @@ import FlagModel from './model';
     * @param {string} freetId - The id of the given freet
     * @return {Promise<Boolean>} - An array of all of the users who follow userID
     */
-      static async removeFlag(userId: Types.ObjectId | string, freetId: Types.ObjectId | string): Promise<Boolean> {
-        const user: User = await UserCollection.findOneByUserId(userId);
-        const post: Freet = await FreetCollection.findOne(freetId);
-        const flag = await FlagModel.deleteMany({user:user, post: post});
+      static async removeFlag(username: string, freetId: Types.ObjectId | string): Promise<Boolean> {
+        const freet: Freet = await FreetCollection.findOne(freetId);
+        const flag = await FlagModel.deleteMany({username:username, freet: freet});
         return flag !== null;
     }
 
@@ -58,12 +56,11 @@ import FlagModel from './model';
     * Modify flag on a freet
     *
     * @param {string} freetId - The id of the given freet
-    * @return {Promise<Flag>} - An array of all of the flags associated with the post
+    * @return {Promise<Flag>} - An array of all of the flags associated with the freet
     */
-     static async updateFlagType(userId: Types.ObjectId | string, freetId: Types.ObjectId | string, flagType: string): Promise<Flag> {
-        const user: User = await UserCollection.findOneByUserId(userId);
-        const post: Freet = await FreetCollection.findOne(freetId);
-        const flag = await FlagModel.findOne({user: user, post:post});
+     static async updateFlagType(username:  string, freetId: Types.ObjectId | string, flagType: string): Promise<Flag> {
+        const freet: Freet = await FreetCollection.findOne(freetId);
+        const flag = await FlagModel.findOne({username: username, freet:freet});
         flag.flagType = flagType;
         await flag.save()
 
