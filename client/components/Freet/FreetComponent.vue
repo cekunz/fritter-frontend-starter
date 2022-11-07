@@ -22,7 +22,7 @@
     <div
         v-if="!isContentBlocked"
     >
-      <header>
+      <header class='freetHeader'>
         <h3 class="author">
           @{{ freet.author }}
         </h3>
@@ -77,13 +77,15 @@
         <i v-if="freet.edited">(edited)</i>
       </p>
 
-      <footer  
+      <footer  class="buttons" 
         v-if="$store.state.username !== null" >
         <LikeButton
+          class="likebutton"
           v-if="!editing"
           :freet="freet"
         />
         <FlagButton
+         class="flagbutton"
           v-if="!editing"
           :username="freet.author"
           :freet="freet"
@@ -226,9 +228,26 @@ export default {
 </script>
 
 <style scoped>
+.info {
+  /* font-family: 'Courier New', Courier, monospace; */
+  font-size: 18px;
+}
+
+.content {
+  font-size: 22px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+}
+
 .freet {
+    font-family: 'Courier New', Courier, monospace;
+    border-radius: 25px;
     border: 1px solid #111;
     padding: 20px;
     position: relative;
+    margin-bottom: 20px;
 }
 </style>

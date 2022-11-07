@@ -6,6 +6,7 @@
     <section>
       <header>
         <h2>Recap for @{{ $store.state.username }}</h2>
+        <h4><i>Here you can view all the interactions you've had in the past week!</i> </h4>
       </header>
       <body>
           <h3> Week of {{endDate}} - {{startDate}} </h3>
@@ -111,3 +112,11 @@ export default {
 
 
 </script>
+
+<style scoped>
+
+h2, h3, h4, p {
+ font-family: 'Courier New', Courier, monospace;
+}
+
+</style>

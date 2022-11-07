@@ -1,6 +1,6 @@
 
 <template>
-  <div
+  <div class="follow"
     v-if="$store.state.username !== username"
     >
     <button
@@ -110,3 +110,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+.follow {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+</style>

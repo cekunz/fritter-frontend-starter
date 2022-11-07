@@ -4,9 +4,10 @@
   <main>
     <section v-if="$store.state.username">
       <header>
-        <h2> Welcome @{{ $store.state.username }}
+        <h2> Welcome to Fritter, @{{ $store.state.username }}
         <br>
-        You're viewing your Freet Feet </h2>
+        <br>
+        You're viewing your Freet Feed </h2>
       </header>
      
       <CreateFreetForm />
@@ -82,6 +83,7 @@ section {
 }
 
 header, header > * {
+    font-family: 'Courier New', Courier, monospace;
     display: flex;
     justify-content: space-between;
     align-items: center;

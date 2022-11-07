@@ -11,9 +11,9 @@
         v-for="field in fields"
         :key="field.id"
       >
-        <label :for="field.id">{{ field.label }}:</label>
         <textarea
           v-if="field.id === 'content'"
+          placeholder="Add your freet content here!"
           :name="field.id"
           :value="field.value"
           @input="field.value = $event.target.value"
@@ -117,8 +117,9 @@ export default {
 
 <style scoped>
 form {
+  border-radius: 25px;
   border: 1px solid #111;
-  padding: 0.5rem;
+  padding: 15px; 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -137,11 +138,17 @@ form > article p {
 
 form h3,
 form > * {
+  font-family: 'Courier New', Courier, monospace;
   margin: 0.3em 0;
 }
 
 form h3 {
   margin-top: 0;
+}
+
+button {
+  font-size: 20px;
+  font-weight: bold;
 }
 
 textarea {

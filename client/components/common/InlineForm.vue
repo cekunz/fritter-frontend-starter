@@ -51,7 +51,13 @@ form {
 }
 
 input {
+  font-family: 'Courier New', Courier, monospace;
     padding: 0 5px;
-    min-width: 200px;
+    min-width: 300px;
 }
+
+button {
+  font-family: 'Courier New', Courier, monospace;
+}
+
 </style>

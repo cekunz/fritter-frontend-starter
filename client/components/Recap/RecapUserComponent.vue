@@ -53,8 +53,14 @@ export default {
 
 <style scoped>
 .user {
-    border: 1px dashed #111;
+    font-family: 'Courier New', Courier, monospace;
+    border-radius: 25px;
+    border: 1px solid #111;
+    margin-bottom: 20px;
     padding: 20px;
     position: relative;
+}
+.info {
+  font-size: 12;
 }
 </style>

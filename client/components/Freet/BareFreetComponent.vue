@@ -8,8 +8,7 @@
     <header>
       <h3 class="author">
         @{{ freet.author }}
-      </h3>
-      
+      </h3> 
     </header>
     <p
       class="content"
@@ -55,7 +54,10 @@ export default {
 
 <style scoped>
 .freet {
+    font-family: 'Courier New', Courier, monospace;
+    border-radius: 25px;
     border: 1px solid #111;
+    margin-bottom: 20px;
     padding: 20px;
     position: relative;
 }
