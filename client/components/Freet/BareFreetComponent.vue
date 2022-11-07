@@ -61,4 +61,8 @@ export default {
     padding: 20px;
     position: relative;
 }
+
+.info {
+  font-size: 18px;
+}
 </style>

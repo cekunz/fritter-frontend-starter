@@ -61,6 +61,6 @@ export default {
     position: relative;
 }
 .info {
-  font-size: 12;
+  font-size: 18px;
 }
 </style>
