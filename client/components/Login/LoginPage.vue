@@ -30,3 +30,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+h2 {
+  font-family: 'Courier New', Courier, monospace;
+}
+</style>

@@ -133,7 +133,7 @@ export default {
       if (this.contentBlocked === false) return false;
       if (this.$store.state.flags.length > 0) {
         const allFlagsForFreet = this.$store.state.flags.filter((flag) => flag.freet === this.freet._id);
-        if (allFlagsForFreet.length > 5) return true;
+        if (allFlagsForFreet.length > 3) return true;
         else return false;
       }
       else return false;

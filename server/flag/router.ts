@@ -71,7 +71,6 @@ router.get(
       const flagType = req.body.type;
       
       const flag: Flag = await FlagCollection.createFlag(username, freetId, flagType);
-      console.log('flag in router', flag)
       res.status(200).json({
         message: 'The flag was added successfully.',
         flag: flag

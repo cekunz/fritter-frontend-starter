@@ -11,6 +11,7 @@
         v-for="field in fields"
         :key="field.id"
       >
+       <label :for="field.id">{{ field.label }}:</label>
         <textarea
           v-if="field.id === 'content'"
           placeholder="Add your freet content here!"

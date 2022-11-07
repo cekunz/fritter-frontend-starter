@@ -19,8 +19,8 @@ import FlagModel from './model';
     */
      static async getFreetFlags(freetId: Types.ObjectId | string): Promise<Flag[]> {
         const flags: Array<Flag> = await FlagModel.find()
-        flags.filter((x) => JSON.stringify(x.freet._id) === freetId);
-        return flags;
+        const filteredFlags = flags.filter((x) => JSON.stringify(x.freet) === JSON.stringify(freetId));
+        return filteredFlags;
     }
 
     /**

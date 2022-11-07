@@ -90,12 +90,13 @@ const store = new Vuex.Store({
        * Update list of flags for each freet
        */
       const freetIds = state.freets.map((x) => x._id);
+      const newFlags = [];
       for (const i of freetIds) {
         const url = `/api/flag?freetId=${i}`; 
         const res = await fetch(url).then(async r => r.json());
-        state.flags = res.flags;
+        newFlags.push(...res.flags);
       }
-
+      state.flags = newFlags;
     },
     async refreshFreets(state) {
       /**
